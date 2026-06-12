@@ -36,9 +36,14 @@ def _handle_response(response: httpx.Response) -> dict:  # type: ignore[type-arg
 
     try:
         body = response.json()
-        error_code = body.get("error", {}).get("code", "unknown_error")
-        message = body.get("error", {}).get("message", response.text)
-    except Exception:
+    except ValueError:
+        body = None
+
+    error: object = body.get("error") if isinstance(body, dict) else None
+    if isinstance(error, dict):
+        error_code = error.get("code", "unknown_error") or "unknown_error"
+        message = error.get("message", response.text) or response.text
+    else:
         error_code = "unknown_error"
         message = response.text
 

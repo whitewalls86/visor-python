@@ -162,6 +162,21 @@ async def test_async_request_error_raises_transport_error():
         await transport.aclose()
 
 
+@pytest.mark.asyncio
+async def test_async_malformed_error_envelope_unknown_error():
+    """{"error": "oops"} — error is a string, not a dict; must not crash."""
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(500, json={"error": "oops"})
+        )
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(VisorAPIError) as exc_info:
+            await transport.get("/listings")
+        await transport.aclose()
+
+    assert exc_info.value.error_code == "unknown_error"
+
+
 # ---------------------------------------------------------------------------
 # Sync transport
 # ---------------------------------------------------------------------------
