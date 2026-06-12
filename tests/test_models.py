@@ -373,6 +373,67 @@ def test_dealer_filter_extra_fields_rejected() -> None:
         DealerFilter(unknown_param="value")  # type: ignore[call-arg]
 
 
+def test_dealer_filter_limit_max_100() -> None:
+    with pytest.raises(ValidationError, match="limit maximum is 100"):
+        DealerFilter(limit=101)
+
+
+def test_dealer_filter_dealer_id_max_100() -> None:
+    with pytest.raises(ValidationError, match="dealer_id maximum is 100"):
+        DealerFilter(dealer_id=[str(i) for i in range(101)])
+
+
+def test_dealer_filter_limit_100_ok() -> None:
+    f = DealerFilter(limit=100)
+    assert f.to_params()["limit"] == "100"
+
+
+def test_dealer_filter_dealer_id_100_ok() -> None:
+    ids = [str(i) for i in range(100)]
+    f = DealerFilter(dealer_id=ids)
+    assert len(f.dealer_id) == 100  # type: ignore[arg-type]
+
+
+# ---------------------------------------------------------------------------
+# FacetsFilter validators
+# ---------------------------------------------------------------------------
+
+
+from visor.models.facets import FacetsFilter  # noqa: E402
+
+
+def test_facets_filter_value_limit_max_100() -> None:
+    with pytest.raises(ValidationError, match="facet_value_limit maximum is 100"):
+        FacetsFilter(facets=["make"], facet_value_limit=101)
+
+
+def test_facets_filter_value_limit_100_ok() -> None:
+    f = FacetsFilter(facets=["make"], facet_value_limit=100)
+    assert f.to_params()["facet_value_limit"] == "100"
+
+
+def test_facets_filter_metric_requires_one_categorical_facet() -> None:
+    with pytest.raises(ValidationError, match="exactly one categorical facet"):
+        FacetsFilter(facets=["make", "model"], metric="price.p95")
+
+
+def test_facets_filter_metric_with_range_only_rejected() -> None:
+    with pytest.raises(ValidationError, match="exactly one categorical facet"):
+        FacetsFilter(facets=["price"], metric="price.p95")
+
+
+def test_facets_filter_metric_with_one_categorical_ok() -> None:
+    f = FacetsFilter(facets=["make", "price"], metric="price.p95")
+    params = f.to_params()
+    assert params["metric"] == "price.p95"
+    assert "make" in params["facets"]
+
+
+def test_facets_filter_no_metric_allows_multiple_categoricals() -> None:
+    f = FacetsFilter(facets=["make", "model", "state"])
+    assert f.metric is None
+
+
 # ---------------------------------------------------------------------------
 # UsageSummary
 # ---------------------------------------------------------------------------

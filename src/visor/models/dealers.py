@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from visor.models._base import Pagination, VisorRequestModel, VisorResponseModel
 
@@ -14,6 +14,20 @@ class DealerFilter(VisorRequestModel):
     type: Literal["franchise", "independent"] | None = None
     make: list[str] | None = None
     q: str | None = None
+
+    @field_validator("limit")
+    @classmethod
+    def _limit_max(cls, v: int) -> int:
+        if v > 100:
+            raise ValueError("limit maximum is 100")
+        return v
+
+    @field_validator("dealer_id")
+    @classmethod
+    def _dealer_id_max(cls, v: list[str] | None) -> list[str] | None:
+        if v is not None and len(v) > 100:
+            raise ValueError("dealer_id maximum is 100 entries")
+        return v
 
     def to_params(self) -> dict[str, str]:
         params: dict[str, str] = {

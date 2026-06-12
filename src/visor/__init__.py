@@ -11,13 +11,20 @@ from visor.exceptions import (
 )
 from visor.models._base import (
     BBox,
+    DealerRef,
     Pagination,
     VehicleBuild,
     VehicleOption,
     VehicleRecord,
 )
-from visor.models.dealers import DealerDetail, DealerFilter, DealersPage, DealerSummary
-from visor.models.facets import FacetsFilter, FacetsResponse
+from visor.models.dealers import (
+    DealerAddress,
+    DealerDetail,
+    DealerFilter,
+    DealersPage,
+    DealerSummary,
+)
+from visor.models.facets import FacetBucket, FacetsData, FacetsFilter, FacetsResponse
 from visor.models.listings import (
     ListingDetail,
     ListingsFilter,
@@ -25,7 +32,7 @@ from visor.models.listings import (
     ListingsPage,
     ListingSummary,
 )
-from visor.models.usage import UsageSummary
+from visor.models.usage import UsageMeta, UsageRecord, UsageSummary, UsageTotals
 from visor.models.vins import VinDetail
 
 __all__ = [
@@ -39,18 +46,22 @@ __all__ = [
     "VisorAPIError",
     "VisorError",
     "VisorTransportError",
-    # shared
+    # shared base
     "BBox",
+    "DealerRef",
     "Pagination",
     "VehicleBuild",
     "VehicleOption",
     "VehicleRecord",
     # dealers
+    "DealerAddress",
     "DealerDetail",
     "DealerFilter",
     "DealersPage",
     "DealerSummary",
     # facets
+    "FacetBucket",
+    "FacetsData",
     "FacetsFilter",
     "FacetsResponse",
     # listings
@@ -60,7 +71,10 @@ __all__ = [
     "ListingSnapshot",
     "ListingSummary",
     # usage
+    "UsageMeta",
+    "UsageRecord",
     "UsageSummary",
+    "UsageTotals",
     # vins
     "VinDetail",
 ]
