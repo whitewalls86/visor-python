@@ -1,3 +1,4 @@
+from visor._client import AsyncVisorClient
 from visor.exceptions import (
     AuthError,
     ForbiddenError,
@@ -36,6 +37,8 @@ from visor.models.usage import UsageMeta, UsageRecord, UsageSummary, UsageTotals
 from visor.models.vins import VinDetail
 
 __all__ = [
+    # client
+    "AsyncVisorClient",
     # exceptions
     "AuthError",
     "ForbiddenError",
