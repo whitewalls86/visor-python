@@ -1,6 +1,6 @@
 from typing import Literal, TypeAlias
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from visor.models._base import ListingsFilterBase, VisorResponseModel
 
@@ -39,6 +39,10 @@ FACET_NAMES = {
 
 FacetSort: TypeAlias = Literal["count", "-count", "metric", "-metric"]
 
+# Facets that return range histograms; all others are categorical (bucket lists).
+RANGE_FACET_NAMES = {"price", "msrp", "miles", "days_on_market"}
+CATEGORICAL_FACET_NAMES = FACET_NAMES - RANGE_FACET_NAMES
+
 
 class FacetsFilter(ListingsFilterBase):
     """Filter for GET /v1/facets. No pagination or projection."""
@@ -55,6 +59,24 @@ class FacetsFilter(ListingsFilterBase):
         if unknown:
             raise ValueError(f"unknown facets: {unknown}")
         return v
+
+    @field_validator("facet_value_limit")
+    @classmethod
+    def _facet_value_limit_max(cls, v: int | None) -> int | None:
+        if v is not None and v > 100:
+            raise ValueError("facet_value_limit maximum is 100")
+        return v
+
+    @model_validator(mode="after")
+    def _validate_metric_needs_categorical_facet(self) -> "FacetsFilter":
+        if self.metric is not None:
+            categorical = [f for f in self.facets if f in CATEGORICAL_FACET_NAMES]
+            if len(categorical) != 1:
+                raise ValueError(
+                    "metric requires exactly one categorical facet; "
+                    f"got {len(categorical)} ({categorical})"
+                )
+        return self
 
     def to_params(self) -> dict[str, str]:
         params = super().to_params()

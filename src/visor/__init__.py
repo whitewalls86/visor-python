@@ -1,1 +1,80 @@
-# Public exports added in implementation step 12 (after _client and _pagination exist).
+from visor.exceptions import (
+    AuthError,
+    ForbiddenError,
+    NotFoundError,
+    PaymentRequiredError,
+    RateLimitError,
+    ValidationError,
+    VisorAPIError,
+    VisorError,
+    VisorTransportError,
+)
+from visor.models._base import (
+    BBox,
+    DealerRef,
+    Pagination,
+    VehicleBuild,
+    VehicleOption,
+    VehicleRecord,
+)
+from visor.models.dealers import (
+    DealerAddress,
+    DealerDetail,
+    DealerFilter,
+    DealersPage,
+    DealerSummary,
+)
+from visor.models.facets import FacetBucket, FacetsData, FacetsFilter, FacetsResponse
+from visor.models.listings import (
+    ListingDetail,
+    ListingsFilter,
+    ListingSnapshot,
+    ListingsPage,
+    ListingSummary,
+)
+from visor.models.usage import UsageMeta, UsageRecord, UsageSummary, UsageTotals
+from visor.models.vins import VinDetail
+
+__all__ = [
+    # exceptions
+    "AuthError",
+    "ForbiddenError",
+    "NotFoundError",
+    "PaymentRequiredError",
+    "RateLimitError",
+    "ValidationError",
+    "VisorAPIError",
+    "VisorError",
+    "VisorTransportError",
+    # shared base
+    "BBox",
+    "DealerRef",
+    "Pagination",
+    "VehicleBuild",
+    "VehicleOption",
+    "VehicleRecord",
+    # dealers
+    "DealerAddress",
+    "DealerDetail",
+    "DealerFilter",
+    "DealersPage",
+    "DealerSummary",
+    # facets
+    "FacetBucket",
+    "FacetsData",
+    "FacetsFilter",
+    "FacetsResponse",
+    # listings
+    "ListingDetail",
+    "ListingsFilter",
+    "ListingsPage",
+    "ListingSnapshot",
+    "ListingSummary",
+    # usage
+    "UsageMeta",
+    "UsageRecord",
+    "UsageSummary",
+    "UsageTotals",
+    # vins
+    "VinDetail",
+]
