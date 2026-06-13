@@ -285,3 +285,45 @@ def test_sync_request_error_raises_transport_error():
         with pytest.raises(VisorTransportError):
             transport.get("/listings")
         transport.close()
+
+
+# ---------------------------------------------------------------------------
+# Fallback messages for empty 401 / 403 bodies
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "status_code, exc_class", [(401, AuthError), (403, ForbiddenError)]
+)
+def test_sync_empty_body_fallback_message(status_code: int, exc_class: type) -> None:
+    """When the API returns 401/403 with no body, a useful default message is set."""
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(status_code, content=b"")
+        )
+        transport = SyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(exc_class) as exc_info:
+            transport.get("/listings")
+        transport.close()
+
+    assert exc_info.value.message
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "status_code, exc_class", [(401, AuthError), (403, ForbiddenError)]
+)
+async def test_async_empty_body_fallback_message(
+    status_code: int, exc_class: type
+) -> None:
+    """When the API returns 401/403 with no body, a useful default message is set."""
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(status_code, content=b"")
+        )
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(exc_class) as exc_info:
+            await transport.get("/listings")
+        await transport.aclose()
+
+    assert exc_info.value.message

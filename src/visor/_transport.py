@@ -51,11 +51,19 @@ def _handle_response(response: httpx.Response) -> dict:  # type: ignore[type-arg
         case 400:
             raise ValidationError(400, error_code, message)
         case 401:
-            raise AuthError(401, error_code, message)
+            raise AuthError(
+                401,
+                error_code,
+                message or "Invalid or missing API key. Check VISOR_API_KEY.",
+            )
         case 402:
             raise PaymentRequiredError(402, error_code, message)
         case 403:
-            raise ForbiddenError(403, error_code, message)
+            raise ForbiddenError(
+                403,
+                error_code,
+                message or "Access denied. Key lacks permission for this resource.",
+            )
         case 404:
             raise NotFoundError(404, error_code, message)
         case 429:
