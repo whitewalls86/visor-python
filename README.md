@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/whitewalls86/visor-python/actions/workflows/ci.yml/badge.svg)](https://github.com/whitewalls86/visor-python/actions/workflows/ci.yml)
 
-**visor-python** is the official Python SDK for the [Visor Public API](https://api.visor.vin) — a vehicle inventory search platform covering new, used, and certified pre-owned listings from dealers across the US. It provides a thin, fully-typed wrapper around the REST API with sync and async clients, Pydantic response models, and auto-pagination helpers.
+**visor-python** is an unofficial community Python SDK for the [Visor Public API](https://api.visor.vin) — a vehicle inventory search platform covering new, used, and certified pre-owned listings from dealers across the US. It provides a thin, fully-typed wrapper around the REST API with sync and async clients, Pydantic response models, and auto-pagination helpers.
+
+> **Disclaimer:** This is an unofficial community SDK and is not affiliated with or endorsed by Visor (Currents Systems Inc.).
 
 > **Pre-1.0 notice:** This package is in initial development (`0.x`). Minor version bumps may include breaking changes. Pin to a specific minor version in production and review the [CHANGELOG](CHANGELOG.md) before upgrading.
 
@@ -116,7 +118,7 @@ client = VisorClient(api_key="vsr_live_...")
 client = VisorClient()
 ```
 
-API keys are available from Visor — see [api.visor.vin](https://api.visor.vin) for details.
+You need your own Visor API key — see [api.visor.vin](https://api.visor.vin) for details. Use of the API is governed by Visor's API terms; you are responsible for complying with them.
 
 ### Timeout
 
