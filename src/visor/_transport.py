@@ -1,5 +1,6 @@
 from datetime import datetime
 from email.utils import parsedate_to_datetime
+from typing import Any
 
 import httpx
 
@@ -30,9 +31,15 @@ def _parse_retry_after(value: str | None) -> int | None:
         return max(0, int((retry_at - datetime.now(retry_at.tzinfo)).total_seconds()))
 
 
-def _handle_response(response: httpx.Response) -> dict:  # type: ignore[type-arg]
+def _handle_response(response: httpx.Response) -> dict[str, Any]:
     if response.is_success:
-        return response.json()  # type: ignore[no-any-return]
+        try:
+            data: Any = response.json()
+        except ValueError as e:
+            raise VisorTransportError(f"Received malformed JSON from API: {e}") from e
+        if not isinstance(data, dict):
+            raise VisorTransportError("Received non-object JSON from API")
+        return data
 
     try:
         body = response.json()
@@ -86,7 +93,9 @@ class AsyncVisorTransport:
             timeout=timeout,
         )
 
-    async def get(self, path: str, params: dict[str, str] | None = None) -> dict:  # type: ignore[type-arg]
+    async def get(
+        self, path: str, params: dict[str, str] | None = None
+    ) -> dict[str, Any]:
         try:
             response = await self._client.get(path, params=params or {})
         except httpx.RequestError as e:
@@ -110,7 +119,7 @@ class SyncVisorTransport:
             timeout=timeout,
         )
 
-    def get(self, path: str, params: dict[str, str] | None = None) -> dict:  # type: ignore[type-arg]
+    def get(self, path: str, params: dict[str, str] | None = None) -> dict[str, Any]:
         try:
             response = self._client.get(path, params=params or {})
         except httpx.RequestError as e:

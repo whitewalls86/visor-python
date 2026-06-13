@@ -143,6 +143,38 @@ def test_valid_facets_accepted() -> None:
 
 
 # ---------------------------------------------------------------------------
+# snapshot_date serialization
+# ---------------------------------------------------------------------------
+
+
+def test_snapshot_date_serializes() -> None:
+    f = ListingsFilter(snapshot_date=date(2025, 6, 15))
+    assert f.to_params()["snapshot_date"] == "2025-06-15"
+
+
+# ---------------------------------------------------------------------------
+# include serialization
+# ---------------------------------------------------------------------------
+
+
+def test_include_serializes() -> None:
+    f = ListingsFilter(include=["price_history", "options"])
+    assert f.to_params()["include"] == "price_history,options"
+
+
+# ---------------------------------------------------------------------------
+# Empty list filters are omitted from query params
+# ---------------------------------------------------------------------------
+
+
+def test_empty_list_omitted_from_params() -> None:
+    # Empty lists (not None) are falsy and skipped by the comma/pipe helpers,
+    # so they are omitted from the serialized query string.
+    f = ListingsFilter(make=[])
+    assert "make" not in f.to_params()
+
+
+# ---------------------------------------------------------------------------
 # ListingsFilterBase is accessible directly (used by downstream callers)
 # ---------------------------------------------------------------------------
 
