@@ -2,13 +2,10 @@ import pytest
 
 from visor import AuthError, NotFoundError, VisorClient, VisorTransportError
 
-pytestmark = [pytest.mark.integration, pytest.mark.release_gate]
-
-# test_transport_error_unreachable_host is marked integration only (not
-# release_gate) because it exercises DNS/network behavior, not the live
-# Visor API or the release key.
+pytestmark = pytest.mark.integration
 
 
+@pytest.mark.release_gate
 def test_auth_error_bad_key() -> None:
     with (
         VisorClient(api_key="vsr_live_thisisnotarealkey") as bad_client,
@@ -21,19 +18,20 @@ def test_auth_error_bad_key() -> None:
     assert "401" in str(exc_info.value)
 
 
+@pytest.mark.release_gate
 def test_not_found_listing(client: VisorClient) -> None:
     with pytest.raises(NotFoundError) as exc_info:
         client.get_listing("00000000000000000000000000000000")
     assert exc_info.value.status_code == 404
 
 
+@pytest.mark.release_gate
 def test_not_found_dealer(client: VisorClient) -> None:
     with pytest.raises(NotFoundError) as exc_info:
         client.get_dealer("00000000-0000-0000-0000-000000000000")
     assert exc_info.value.status_code == 404
 
 
-@pytest.mark.integration
 def test_transport_error_unreachable_host() -> None:
     with (
         VisorClient(
