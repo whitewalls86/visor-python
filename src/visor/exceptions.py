@@ -13,11 +13,21 @@ class VisorAPIError(VisorError):
 
 
 class AuthError(VisorAPIError):
-    """401 — authentication failed."""
+    """HTTP 401 — the request was not authenticated.
+
+    Raised when the API key is missing, malformed, or invalid. Check that
+    ``VISOR_API_KEY`` is set to a valid key, or pass ``api_key`` explicitly
+    when constructing the client.
+    """
 
 
 class ForbiddenError(VisorAPIError):
-    """403 — access denied."""
+    """HTTP 403 — the request was authenticated but not authorized.
+
+    Raised when a valid API key does not have permission to access the
+    requested resource or perform the requested action. Contact Visor support
+    if you believe you should have access.
+    """
 
 
 class NotFoundError(VisorAPIError):
@@ -33,7 +43,19 @@ class PaymentRequiredError(VisorAPIError):
 
 
 class RateLimitError(VisorAPIError):
-    """429 — rate limit exceeded."""
+    """HTTP 429 — the API rate limit has been exceeded.
+
+    Attributes:
+        retry_after: Number of seconds to wait before retrying, or ``None``
+            if the API did not include a usable ``Retry-After`` header. When
+            present the value is derived from an integer seconds value or an
+            HTTP-date header, whichever the API provides. Build your retry
+            loop around this value:
+
+                except RateLimitError as e:
+                    wait = e.retry_after if e.retry_after is not None else 2 ** attempt
+                    time.sleep(wait)
+    """
 
     def __init__(
         self,
