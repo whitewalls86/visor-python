@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from visor.models._base import (
     DealerRef,
     VehicleBuild,
+    VehicleOption,
     VehicleRecord,
 )
 from visor.models.dealers import (
@@ -88,6 +89,14 @@ def test_listing_summary_extra_fields_ignored() -> None:
     assert ls.id == "x"
 
 
+def test_vehicle_option_msrp_accepts_float() -> None:
+    # Live API sends floats with FP noise (e.g. 950.0000000000001); must not reject.
+    opt = VehicleOption.model_validate(
+        {"code": "X1", "name": "Sunroof", "msrp": 950.0000000000001}
+    )
+    assert opt.msrp == pytest.approx(950.0)
+
+
 # ---------------------------------------------------------------------------
 # ListingDetail
 # ---------------------------------------------------------------------------
@@ -128,7 +137,7 @@ def test_listing_detail_parses() -> None:
     assert ld.vehicle.build.combined_msrp == 37500
     assert ld.dealer.name == "North Hollywood Toyota"
     assert ld.photo_urls == []
-    assert ld.price_history == []
+    assert ld.price_history is None
 
 
 def test_listing_detail_vehicle_uses_vehicle_record() -> None:
@@ -143,6 +152,14 @@ def test_listing_detail_vehicle_uses_vehicle_record() -> None:
     ld = ListingDetail.model_validate(data)
     assert isinstance(ld.vehicle, VehicleRecord)
     assert isinstance(ld.vehicle.build, VehicleBuild)
+
+
+def test_vehicle_build_options_null() -> None:
+    # Live API sends "options": null when include=["options"] is not requested.
+    build = VehicleBuild.model_validate(
+        {"year": 2026, "make": "Toyota", "model": "Camry", "options": None}
+    )
+    assert build.options is None
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +205,19 @@ def test_listing_snapshot_parses() -> None:
     assert snap.id == "snap1"
     assert snap.price == 40000
     assert isinstance(snap.dealer, DealerRef)
+
+
+def test_listing_snapshot_price_history_null() -> None:
+    # Live API sends null for price_history when not requested via include=.
+    snap = ListingSnapshot.model_validate(
+        {
+            "id": "s1",
+            "inventory_type": "new",
+            "dealer": DEALER_REF_DATA,
+            "price_history": None,
+        }
+    )
+    assert snap.price_history is None
 
 
 # ---------------------------------------------------------------------------

@@ -78,3 +78,8 @@ python_version = "3.10"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "integration: live API tests, requires VISOR_API_KEY",
+    "release_gate: stable live tests required before publishing",
+    "manual: live tests that require special account state or credentials",
+]

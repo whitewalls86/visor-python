@@ -2,7 +2,7 @@ from datetime import date
 from enum import Enum
 from typing import Any, NamedTuple
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class VisorRequestModel(BaseModel):
@@ -25,7 +25,7 @@ class VisorResponseModel(BaseModel):
 class VehicleOption(VisorResponseModel):
     code: str
     name: str
-    msrp: int | None = None
+    msrp: float | None = None
 
 
 class VehicleBuild(VisorResponseModel):
@@ -52,7 +52,7 @@ class VehicleBuild(VisorResponseModel):
     window_sticker_verified: bool = False
     base_msrp: int | None = None
     combined_msrp: int | None = None
-    options: list[VehicleOption] = Field(default_factory=list)
+    options: list[VehicleOption] | None = None
 
 
 class VehicleRecord(VisorResponseModel):
