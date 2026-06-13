@@ -118,11 +118,9 @@ def test_rate_limit_error_retry_after_defaults_to_none() -> None:
         (403, ForbiddenError),
         (404, NotFoundError),
         (429, RateLimitError),
-        (500, VisorAPIError),
-        (503, VisorAPIError),
     ],
 )
-async def test_status_code_dispatches_correct_exception(
+async def test_mapped_status_dispatches_correct_subclass(
     status: int, exc_class: type[VisorAPIError]
 ) -> None:
     with respx.mock(base_url=API_BASE) as mock:
@@ -130,6 +128,17 @@ async def test_status_code_dispatches_correct_exception(
         async with AsyncVisorClient(api_key="test") as client:
             with pytest.raises(exc_class):
                 await client.filter_listings()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [500, 503])
+async def test_unmapped_status_raises_base_visor_api_error(status: int) -> None:
+    with respx.mock(base_url=API_BASE) as mock:
+        mock.get("/listings").mock(return_value=httpx.Response(status, json=ERROR_BODY))
+        async with AsyncVisorClient(api_key="test") as client:
+            with pytest.raises(VisorAPIError) as exc_info:
+                await client.filter_listings()
+    assert type(exc_info.value) is VisorAPIError
 
 
 # ---------------------------------------------------------------------------

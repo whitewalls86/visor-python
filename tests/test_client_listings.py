@@ -112,11 +112,8 @@ async def test_multiple_makes_all_present_in_url() -> None:
         f = ListingsFilter(make=["Toyota", "Honda", "Ford"])
         async with AsyncVisorClient(api_key="test") as client:
             await client.filter_listings(f)
-    url = str(route.calls[0].request.url)
-    assert "make=" in url
-    assert "Toyota" in url
-    assert "Honda" in url
-    assert "Ford" in url
+    params = route.calls[0].request.url.params
+    assert params["make"] == "Toyota,Honda,Ford"
 
 
 @pytest.mark.asyncio
@@ -128,10 +125,8 @@ async def test_year_integers_serialized_in_url() -> None:
         f = ListingsFilter(year=[2023, 2024, 2025])
         async with AsyncVisorClient(api_key="test") as client:
             await client.filter_listings(f)
-    url = str(route.calls[0].request.url)
-    assert "year=" in url
-    assert "2023" in url
-    assert "2025" in url
+    params = route.calls[0].request.url.params
+    assert params["year"] == "2023,2024,2025"
 
 
 # ---------------------------------------------------------------------------
@@ -348,8 +343,5 @@ async def test_filter_facets_multiple_facet_names_in_url() -> None:
         f = FacetsFilter(facets=["make", "model", "year"])
         async with AsyncVisorClient(api_key="test") as client:
             await client.filter_facets(f)
-    url = str(route.calls[0].request.url)
-    assert "facets=" in url
-    assert "make" in url
-    assert "model" in url
-    assert "year" in url
+    params = route.calls[0].request.url.params
+    assert params["facets"] == "make,model,year"

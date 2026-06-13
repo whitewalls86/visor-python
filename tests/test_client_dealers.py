@@ -61,11 +61,8 @@ async def test_search_dealers_dealer_id_comma_joined() -> None:
         f = DealerFilter(dealer_id=["d1", "d2", "d3"])
         async with AsyncVisorClient(api_key="test") as client:
             await client.search_dealers(f)
-    url = str(route.calls[0].request.url)
-    assert "dealer_id=" in url
-    assert "d1" in url
-    assert "d2" in url
-    assert "d3" in url
+    params = route.calls[0].request.url.params
+    assert params["dealer_id"] == "d1,d2,d3"
 
 
 @pytest.mark.asyncio
@@ -129,10 +126,8 @@ async def test_search_dealers_make_comma_joined() -> None:
         f = DealerFilter(make=["Toyota", "Honda"])
         async with AsyncVisorClient(api_key="test") as client:
             await client.search_dealers(f)
-    url = str(route.calls[0].request.url)
-    assert "make=" in url
-    assert "Toyota" in url
-    assert "Honda" in url
+    params = route.calls[0].request.url.params
+    assert params["make"] == "Toyota,Honda"
 
 
 @pytest.mark.asyncio
@@ -144,10 +139,8 @@ async def test_search_dealers_state_comma_joined() -> None:
         f = DealerFilter(state=["TX", "CA", "NY"])
         async with AsyncVisorClient(api_key="test") as client:
             await client.search_dealers(f)
-    url = str(route.calls[0].request.url)
-    assert "state=" in url
-    assert "TX" in url
-    assert "CA" in url
+    params = route.calls[0].request.url.params
+    assert params["state"] == "TX,CA,NY"
 
 
 @pytest.mark.asyncio
