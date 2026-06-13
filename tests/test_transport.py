@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta, timezone
+from email.utils import format_datetime as email_format_datetime
+
 import httpx
 import pytest
 import respx
@@ -327,3 +330,122 @@ async def test_async_empty_body_fallback_message(
         await transport.aclose()
 
     assert exc_info.value.message
+
+
+# ---------------------------------------------------------------------------
+# Malformed JSON on 2xx raises VisorTransportError
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_async_malformed_success_json_raises_transport_error():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                200,
+                content=b"not-valid-json{{{",
+                headers={"Content-Type": "application/json"},
+            )
+        )
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(VisorTransportError):
+            await transport.get("/listings")
+        await transport.aclose()
+
+
+def test_sync_malformed_success_json_raises_transport_error():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                200,
+                content=b"not-valid-json{{{",
+                headers={"Content-Type": "application/json"},
+            )
+        )
+        transport = SyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(VisorTransportError):
+            transport.get("/listings")
+        transport.close()
+
+
+# ---------------------------------------------------------------------------
+# Retry-After: HTTP-date and invalid-value coverage
+# ---------------------------------------------------------------------------
+
+
+def _future_http_date(seconds_ahead: int = 120) -> str:
+    """Return a valid RFC 7231 HTTP-date string for a moment in the future."""
+    future = datetime.now(timezone.utc) + timedelta(seconds=seconds_ahead)
+    return email_format_datetime(future, usegmt=True)
+
+
+def test_sync_rate_limit_retry_after_http_date():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                429,
+                headers={"Retry-After": _future_http_date(120)},
+                json=ERROR_BODY,
+            )
+        )
+        transport = SyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(RateLimitError) as exc_info:
+            transport.get("/listings")
+        transport.close()
+
+    assert isinstance(exc_info.value.retry_after, int)
+    assert exc_info.value.retry_after >= 0
+
+
+def test_sync_rate_limit_retry_after_invalid_value():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                429,
+                headers={"Retry-After": "not-a-number-or-date"},
+                json=ERROR_BODY,
+            )
+        )
+        transport = SyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(RateLimitError) as exc_info:
+            transport.get("/listings")
+        transport.close()
+
+    assert exc_info.value.retry_after is None
+
+
+@pytest.mark.asyncio
+async def test_async_rate_limit_retry_after_http_date():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                429,
+                headers={"Retry-After": _future_http_date(120)},
+                json=ERROR_BODY,
+            )
+        )
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(RateLimitError) as exc_info:
+            await transport.get("/listings")
+        await transport.aclose()
+
+    assert isinstance(exc_info.value.retry_after, int)
+    assert exc_info.value.retry_after >= 0
+
+
+@pytest.mark.asyncio
+async def test_async_rate_limit_retry_after_invalid_value():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(
+            return_value=httpx.Response(
+                429,
+                headers={"Retry-After": "not-a-number-or-date"},
+                json=ERROR_BODY,
+            )
+        )
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(RateLimitError) as exc_info:
+            await transport.get("/listings")
+        await transport.aclose()
+
+    assert exc_info.value.retry_after is None

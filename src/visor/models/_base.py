@@ -225,6 +225,9 @@ class ListingsFilterBase(VisorRequestModel):
             and self.inventory_status != InventoryMode.ACTIVE
         ):
             raise ValueError("snapshot_date requires inventory_status='active'")
+        # NOTE: this branch is unreachable in practice — earlier checks already
+        # enforce sold_within_days→SOLD and snapshot_date→ACTIVE, making both
+        # non-None simultaneously impossible. Kept as a logical guard.
         if self.sold_within_days is not None and self.snapshot_date is not None:
             raise ValueError(
                 "sold_within_days and snapshot_date are mutually exclusive"
