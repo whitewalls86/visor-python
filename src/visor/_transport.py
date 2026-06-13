@@ -1,6 +1,6 @@
 from datetime import datetime
 from email.utils import parsedate_to_datetime
-from typing import Any
+from typing import Any, cast
 
 import httpx
 
@@ -34,9 +34,10 @@ def _parse_retry_after(value: str | None) -> int | None:
 def _handle_response(response: httpx.Response) -> dict[str, Any]:
     if response.is_success:
         try:
-            return response.json()  # type: ignore[no-any-return]
+            data: Any = response.json()
         except ValueError as e:
             raise VisorTransportError(f"Received malformed JSON from API: {e}") from e
+        return cast(dict[str, Any], data)
 
     try:
         body = response.json()
