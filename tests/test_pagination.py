@@ -214,6 +214,36 @@ async def test_paginate_dealers_max_pages() -> None:
 
 
 @pytest.mark.asyncio
+async def test_paginate_dealers_stops_on_none_next_offset() -> None:
+    page = _dealers_page([_dealer("d1")], next_offset=None)
+    client = FakeAsyncClient([], [page])
+
+    results = [item async for item in paginate_dealers(client)]
+
+    assert len(results) == 1
+    assert len(client.dealer_calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_paginate_dealers_max_pages_zero_yields_nothing() -> None:
+    client = FakeAsyncClient([], [])
+    results = [item async for item in paginate_dealers(client, max_pages=0)]
+    assert results == []
+    assert client.dealer_calls == []
+
+
+@pytest.mark.asyncio
+async def test_paginate_dealers_none_filter_uses_defaults() -> None:
+    page = _dealers_page([_dealer("d1")], next_offset=None)
+    client = FakeAsyncClient([], [page])
+
+    _ = [item async for item in paginate_dealers(client, None)]
+
+    assert len(client.dealer_calls) == 1
+    assert client.dealer_calls[0] == DealerFilter()
+
+
+@pytest.mark.asyncio
 async def test_paginate_dealers_does_not_mutate_original_filter() -> None:
     page1 = _dealers_page([_dealer("d1")], next_offset=2)
     page2 = _dealers_page([_dealer("d2")], next_offset=None, offset=2)
@@ -292,6 +322,9 @@ def test_iter_dealers_two_pages() -> None:
     results = list(iter_dealers(client))
 
     assert [r.dealer_id for r in results] == ["d1", "d2", "d3", "d4"]
+    assert len(client.dealer_calls) == 2
+    assert client.dealer_calls[0].offset == 0
+    assert client.dealer_calls[1].offset == 2
 
 
 def test_iter_dealers_max_pages() -> None:
@@ -304,6 +337,13 @@ def test_iter_dealers_max_pages() -> None:
     assert [r.dealer_id for r in results] == ["d1"]
 
 
+def test_iter_dealers_max_pages_zero_yields_nothing() -> None:
+    client = FakeSyncClient([], [])
+    results = list(iter_dealers(client, max_pages=0))
+    assert results == []
+    assert client.dealer_calls == []
+
+
 def test_iter_dealers_does_not_mutate_original_filter() -> None:
     page1 = _dealers_page([_dealer("d1")], next_offset=2)
     page2 = _dealers_page([_dealer("d2")], next_offset=None, offset=2)
@@ -313,3 +353,12 @@ def test_iter_dealers_does_not_mutate_original_filter() -> None:
     list(iter_dealers(client, original))
 
     assert original.offset == 0
+
+
+def test_iter_dealers_none_filter_uses_defaults() -> None:
+    page = _dealers_page([_dealer("d1")], next_offset=None)
+    client = FakeSyncClient([], [page])
+
+    list(iter_dealers(client, None))
+
+    assert client.dealer_calls[0] == DealerFilter()
