@@ -230,7 +230,7 @@ class AsyncVisorClient:
 
         Accepts the same :class:`~visor.models.listings.ListingsFilter` shape
         as :meth:`filter_listings`, so you can reuse a filter object across
-        both methods. Call this method in a loop advancing ``filter.page`` to
+        both methods. Call this method in a loop advancing ``filter.offset`` to
         paginate through all inventory pages.
 
         Args:
@@ -520,7 +520,7 @@ class VisorClient:
 
         Accepts the same :class:`~visor.models.listings.ListingsFilter` shape
         as :meth:`filter_listings`, so you can reuse a filter object across
-        both methods. Call this method in a loop advancing ``filter.page`` to
+        both methods. Call this method in a loop advancing ``filter.offset`` to
         paginate through all inventory pages.
 
         Args:
