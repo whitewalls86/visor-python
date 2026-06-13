@@ -1,0 +1,57 @@
+name: Feature request or API coverage
+description: Request a new SDK feature, endpoint wrapper, or model coverage.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve visor-python.
+
+        Please do not include API keys, secrets, or sensitive live API response data.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What do you want to do?
+      description: Describe the workflow or capability you want the SDK to support.
+      placeholder: I want to...
+    validations:
+      required: true
+
+  - type: input
+    id: api-area
+    attributes:
+      label: Related Visor API area
+      description: Endpoint, resource, or SDK area if known.
+      placeholder: listings, dealers, VIN lookup, facets, usage, pagination, models
+
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: Proposed SDK API
+      description: If you have a preferred Python API shape, sketch it here.
+      render: python
+      placeholder: |
+        with VisorClient() as client:
+            result = client.some_method(...)
+
+  - type: textarea
+    id: value
+    attributes:
+      label: Why is this useful?
+      description: Explain the use case or user impact.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workaround or different API shape you considered.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links, examples, or redacted response shapes that may help.
