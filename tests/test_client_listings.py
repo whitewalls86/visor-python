@@ -104,7 +104,7 @@ async def test_normal_list_field_comma_separated() -> None:
 
 
 @pytest.mark.asyncio
-async def test_multiple_makes_all_present_in_url() -> None:
+async def test_multiple_makes_comma_joined_in_param() -> None:
     with respx.mock(base_url=API_BASE) as mock:
         route = mock.get("/listings").mock(
             return_value=httpx.Response(200, json=LISTINGS_PAGE)
