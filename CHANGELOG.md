@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-13
+
+### Fixed
+
+- Updated PyPI homepage metadata to point to the community SDK repository instead
+  of the Visor website.
+
 ## [0.1.0] - 2026-06-13
 
 ### Added
@@ -25,5 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish-grade `pyproject.toml` metadata: authors, classifiers, keywords, license files, URLs
 - CI matrix across Python 3.10–3.13 with separate lint, test, and build jobs
 
-[Unreleased]: https://github.com/whitewalls86/visor-python/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/whitewalls86/visor-python/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/whitewalls86/visor-python/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/whitewalls86/visor-python/releases/tag/v0.1.0
