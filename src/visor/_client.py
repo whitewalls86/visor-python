@@ -230,8 +230,8 @@ class AsyncVisorClient:
 
         Accepts the same :class:`~visor.models.listings.ListingsFilter` shape
         as :meth:`filter_listings`, so you can reuse a filter object across
-        both methods. To iterate all inventory pages, use
-        :func:`visor.paginate_listings` with the ``dealer_id`` parameter.
+        both methods. Call this method in a loop advancing ``filter.page`` to
+        paginate through all inventory pages.
 
         Args:
             dealer_id: The unique dealer identifier.
@@ -520,8 +520,8 @@ class VisorClient:
 
         Accepts the same :class:`~visor.models.listings.ListingsFilter` shape
         as :meth:`filter_listings`, so you can reuse a filter object across
-        both methods. To iterate all inventory pages, use
-        :func:`visor.iter_listings` with the ``dealer_id`` parameter.
+        both methods. Call this method in a loop advancing ``filter.page`` to
+        paginate through all inventory pages.
 
         Args:
             dealer_id: The unique dealer identifier.
