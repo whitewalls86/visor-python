@@ -31,7 +31,8 @@ with VisorClient() as client:  # reads VISOR_API_KEY from env
 
     # Look up a specific VIN
     vin = client.lookup_vin("4T1DAACKXTU765422", include=["price_history"])
-    print(vin.build.combined_msrp)
+    msrp = f"${vin.build.combined_msrp:,}" if vin.build.combined_msrp is not None else "N/A"
+    print(msrp)
 
     # Paginate all results
     for listing in iter_listings(client, ListingsFilter(make=["Ford"], state=["TX"])):
@@ -79,7 +80,8 @@ with VisorClient() as client:
     try:
         page = client.filter_listings(ListingsFilter(make=["Toyota"]))
     except RateLimitError as e:
-        print(f"Rate limited — retry after {e.retry_after}s")
+        retry_after = f"{e.retry_after}s" if e.retry_after is not None else "later"
+        print(f"Rate limited — retry {retry_after}")
     except VisorAPIError as e:
         print(f"API error {e.status_code}: {e}")
 ```
