@@ -104,8 +104,9 @@ class ListingsFilter(ListingsFilterBase):
 class ListingSummary(VisorResponseModel):
     """Returned by filter_listings() and dealer_inventory().
 
-    Fields are optional because the caller controls projection via
-    ListingsFilter.fields.
+    id and vin are always present; the API returns them regardless of fields
+    projection. All other fields are optional because the caller controls which
+    fields are returned via ListingsFilter.fields.
     """
 
     id: str
