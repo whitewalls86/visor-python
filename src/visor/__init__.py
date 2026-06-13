@@ -1,4 +1,4 @@
-from visor._client import AsyncVisorClient
+from visor._client import AsyncVisorClient, VisorClient
 from visor._pagination import (
     iter_dealers,
     iter_listings,
@@ -45,6 +45,7 @@ from visor.models.vins import VinDetail
 __all__ = [
     # client
     "AsyncVisorClient",
+    "VisorClient",
     # pagination
     "paginate_listings",
     "paginate_dealers",
