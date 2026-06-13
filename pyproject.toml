@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "visor-python"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python SDK for the Visor Public API"
 readme = "README.md"
 license = "MIT"
@@ -44,7 +44,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://visor.vin"
+Homepage = "https://github.com/whitewalls86/visor-python"
 Repository = "https://github.com/whitewalls86/visor-python"
 Issues = "https://github.com/whitewalls86/visor-python/issues"
 Changelog = "https://github.com/whitewalls86/visor-python/blob/master/CHANGELOG.md"
