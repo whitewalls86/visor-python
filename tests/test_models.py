@@ -128,7 +128,7 @@ def test_listing_detail_parses() -> None:
     assert ld.vehicle.build.combined_msrp == 37500
     assert ld.dealer.name == "North Hollywood Toyota"
     assert ld.photo_urls == []
-    assert ld.price_history == []
+    assert ld.price_history is None
 
 
 def test_listing_detail_vehicle_uses_vehicle_record() -> None:

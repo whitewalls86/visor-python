@@ -174,7 +174,7 @@ class ListingDetail(VisorResponseModel):
     last_checked_at: str | None = None
     dealer: DealerRef
     vehicle: VehicleRecord
-    price_history: list[PriceHistoryEntry] = Field(default_factory=list)
+    price_history: list[PriceHistoryEntry] | None = None
 
 
 class ListingSnapshot(VisorResponseModel):
@@ -196,7 +196,7 @@ class ListingSnapshot(VisorResponseModel):
     sold_date: date | None = None
     last_checked_at: str | None = None
     dealer: DealerRef
-    price_history: list[PriceHistoryEntry] = Field(default_factory=list)
+    price_history: list[PriceHistoryEntry] | None = None
 
 
 class ListingsPage(VisorResponseModel):
