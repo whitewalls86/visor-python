@@ -2,6 +2,16 @@ import httpx
 import pytest
 import respx
 
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--run-integration",
+        action="store_true",
+        default=False,
+        help="Run live Visor API integration tests",
+    )
+
+
 API_BASE = "https://api.visor.vin/v1"
 
 

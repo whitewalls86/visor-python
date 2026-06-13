@@ -6,15 +6,6 @@ import pytest_asyncio
 from visor import AsyncVisorClient, VisorClient
 
 
-def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption(
-        "--run-integration",
-        action="store_true",
-        default=False,
-        help="Run live Visor API integration tests",
-    )
-
-
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers", "integration: mark test as requiring a live API key"

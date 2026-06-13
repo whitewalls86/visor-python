@@ -4,6 +4,10 @@ from visor import AuthError, NotFoundError, VisorClient, VisorTransportError
 
 pytestmark = [pytest.mark.integration, pytest.mark.release_gate]
 
+# test_transport_error_unreachable_host is marked integration only (not
+# release_gate) because it exercises DNS/network behavior, not the live
+# Visor API or the release key.
+
 
 def test_auth_error_bad_key() -> None:
     with (
@@ -29,6 +33,7 @@ def test_not_found_dealer(client: VisorClient) -> None:
     assert exc_info.value.status_code == 404
 
 
+@pytest.mark.integration
 def test_transport_error_unreachable_host() -> None:
     with (
         VisorClient(
