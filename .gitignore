@@ -25,3 +25,9 @@ CLAUDE.md
 # Docs (local reference material)
 Design Docs/
 Visor API docs/
+
+# Graphify knowledge graph outputs
+graphify-out/
+
+# Environment variables
+.env
