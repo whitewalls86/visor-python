@@ -368,6 +368,25 @@ def test_sync_malformed_success_json_raises_transport_error():
         transport.close()
 
 
+def test_sync_non_object_success_json_raises_transport_error():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(return_value=httpx.Response(200, json=[1, 2, 3]))
+        transport = SyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(VisorTransportError):
+            transport.get("/listings")
+        transport.close()
+
+
+@pytest.mark.asyncio
+async def test_async_non_object_success_json_raises_transport_error():
+    with respx.mock(base_url=DEFAULT_BASE_URL) as mock:
+        mock.get("/listings").mock(return_value=httpx.Response(200, json=[1, 2, 3]))
+        transport = AsyncVisorTransport(api_key=API_KEY)
+        with pytest.raises(VisorTransportError):
+            await transport.get("/listings")
+        await transport.aclose()
+
+
 # ---------------------------------------------------------------------------
 # Retry-After: HTTP-date and invalid-value coverage
 # ---------------------------------------------------------------------------

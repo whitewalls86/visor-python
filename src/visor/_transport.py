@@ -1,6 +1,6 @@
 from datetime import datetime
 from email.utils import parsedate_to_datetime
-from typing import Any, cast
+from typing import Any
 
 import httpx
 
@@ -37,7 +37,9 @@ def _handle_response(response: httpx.Response) -> dict[str, Any]:
             data: Any = response.json()
         except ValueError as e:
             raise VisorTransportError(f"Received malformed JSON from API: {e}") from e
-        return cast(dict[str, Any], data)
+        if not isinstance(data, dict):
+            raise VisorTransportError("Received non-object JSON from API")
+        return data
 
     try:
         body = response.json()
