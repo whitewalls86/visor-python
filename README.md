@@ -55,7 +55,7 @@ page = client.filter_listings(
 )
 ```
 
-`radius` requires a geo anchor (`postal_code`, `latitude`/`longitude`, or `dealer_id`). Passing `radius` alone raises `ValueError` before any network call.
+`radius` requires exactly one of `postal_code` or `latitude`/`longitude`. Passing `radius` alone (or with neither) raises `ValueError` before any network call.
 
 ### Paginating all results
 
@@ -147,7 +147,7 @@ client = VisorClient(base_url="http://localhost:8080")
 ```python
 filter = ListingsFilter(
     make=["Toyota"],
-    fields=["vin", "price", "mileage"],
+    fields=["vin", "price", "miles"],
 )
 ```
 
@@ -183,7 +183,7 @@ Exception hierarchy:
 | Exception | When |
 |---|---|
 | `VisorAPIError` | Base for all API errors; has `.status_code` |
-| `AuthenticationError` | 401 — invalid or missing API key |
+| `AuthError` | 401 — invalid or missing API key |
 | `NotFoundError` | 404 — resource does not exist |
 | `RateLimitError` | 429 — includes `.retry_after` (seconds, or `None`) |
 
