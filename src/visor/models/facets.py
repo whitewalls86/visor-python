@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias
+from enum import Enum
 
 from pydantic import Field, field_validator, model_validator
 
@@ -37,7 +37,13 @@ FACET_NAMES = {
     "days_on_market",
 }
 
-FacetSort: TypeAlias = Literal["count", "-count", "metric", "-metric"]
+
+class FacetSort(str, Enum):
+    COUNT = "count"
+    COUNT_DESC = "-count"
+    METRIC = "metric"
+    METRIC_DESC = "-metric"
+
 
 # Facets that return range histograms; all others are categorical (bucket lists).
 RANGE_FACET_NAMES = {"price", "msrp", "miles", "days_on_market"}
@@ -50,7 +56,7 @@ class FacetsFilter(ListingsFilterBase):
     facets: list[str]
     facet_value_limit: int | None = None
     metric: str | None = None
-    sort: FacetSort = "-count"
+    sort: FacetSort = FacetSort.COUNT_DESC
 
     @field_validator("facets")
     @classmethod
@@ -85,7 +91,7 @@ class FacetsFilter(ListingsFilterBase):
             params["facet_value_limit"] = str(self.facet_value_limit)
         if self.metric is not None:
             params["metric"] = self.metric
-        params["sort"] = self.sort
+        params["sort"] = self.sort.value
         return params
 
 

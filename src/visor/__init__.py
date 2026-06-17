@@ -31,7 +31,13 @@ from visor.models.dealers import (
     DealersPage,
     DealerSummary,
 )
-from visor.models.facets import FacetBucket, FacetsData, FacetsFilter, FacetsResponse
+from visor.models.facets import (
+    FacetBucket,
+    FacetsData,
+    FacetsFilter,
+    FacetSort,
+    FacetsResponse,
+)
 from visor.models.listings import (
     ListingDetail,
     ListingsFilter,
@@ -79,6 +85,7 @@ __all__ = [
     "FacetsData",
     "FacetsFilter",
     "FacetsResponse",
+    "FacetSort",
     # listings
     "ListingDetail",
     "ListingsFilter",
