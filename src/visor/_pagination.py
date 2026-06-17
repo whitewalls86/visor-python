@@ -29,6 +29,7 @@ async def paginate_listings(
     *,
     max_pages: int | None = None,
 ) -> AsyncGenerator[ListingSummary, None]:
+    # Async generators cannot use `yield from`, so items are yielded one by one.
     if max_pages is not None and max_pages <= 0:
         return
     current = filter if filter is not None else ListingsFilter()
@@ -51,6 +52,7 @@ async def paginate_dealers(
     *,
     max_pages: int | None = None,
 ) -> AsyncGenerator[DealerSummary, None]:
+    # Async generators cannot use `yield from`, so items are yielded one by one.
     if max_pages is not None and max_pages <= 0:
         return
     current = filter if filter is not None else DealerFilter()

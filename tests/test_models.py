@@ -20,6 +20,8 @@ from visor.models.dealers import (
 )
 from visor.models.facets import (
     FacetsData,
+    FacetsFilter,
+    FacetSort,
     FacetsResponse,
 )
 from visor.models.listings import (
@@ -163,6 +165,92 @@ def test_vehicle_build_options_null() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Include-field semantics: None / [] / [...]
+#
+# Fields backed by include= follow a three-way contract:
+#   None  — section not requested; API omitted or sent null
+#   []    — section requested but empty
+#   [...] — section requested and populated
+# ---------------------------------------------------------------------------
+
+
+def test_listing_detail_price_history_none_when_not_requested() -> None:
+    data = {
+        "id": "a",
+        "vin": "VIN1",
+        "status": "active",
+        "inventory_type": "new",
+        "dealer": DEALER_REF_DATA,
+        "vehicle": VEHICLE_RECORD_DATA,
+    }
+    ld = ListingDetail.model_validate(data)
+    assert ld.price_history is None
+
+
+def test_listing_detail_price_history_empty_list_when_requested_but_empty() -> None:
+    data = {
+        "id": "a",
+        "vin": "VIN1",
+        "status": "active",
+        "inventory_type": "new",
+        "dealer": DEALER_REF_DATA,
+        "vehicle": VEHICLE_RECORD_DATA,
+        "price_history": [],
+    }
+    ld = ListingDetail.model_validate(data)
+    assert ld.price_history == []
+
+
+def test_listing_detail_price_history_populated() -> None:
+    data = {
+        "id": "a",
+        "vin": "VIN1",
+        "status": "active",
+        "inventory_type": "new",
+        "dealer": DEALER_REF_DATA,
+        "vehicle": VEHICLE_RECORD_DATA,
+        "price_history": [{"date": "2026-01-01", "price": 35000}],
+    }
+    ld = ListingDetail.model_validate(data)
+    assert ld.price_history is not None
+    assert len(ld.price_history) == 1
+    assert ld.price_history[0].price == 35000
+
+
+def test_listing_snapshot_price_history_empty_list_when_requested_but_empty() -> None:
+    snap = ListingSnapshot.model_validate(
+        {
+            "id": "s1",
+            "inventory_type": "new",
+            "dealer": DEALER_REF_DATA,
+            "price_history": [],
+        }
+    )
+    assert snap.price_history == []
+
+
+def test_vehicle_build_options_empty_list_when_requested_but_empty() -> None:
+    build = VehicleBuild.model_validate(
+        {"year": 2026, "make": "Toyota", "model": "Camry", "options": []}
+    )
+    assert build.options == []
+
+
+def test_vehicle_build_options_populated() -> None:
+    build = VehicleBuild.model_validate(
+        {
+            "year": 2026,
+            "make": "Toyota",
+            "model": "Camry",
+            "options": [{"code": "X1", "name": "Sunroof", "msrp": 1200.0}],
+        }
+    )
+    assert build.options is not None
+    assert len(build.options) == 1
+    assert build.options[0].code == "X1"
+
+
+# ---------------------------------------------------------------------------
 # ListingsPage
 # ---------------------------------------------------------------------------
 
@@ -303,6 +391,41 @@ def test_facets_data_defaults() -> None:
 
 
 # ---------------------------------------------------------------------------
+# FacetSort enum
+# ---------------------------------------------------------------------------
+
+
+def test_facet_sort_default_is_count_desc() -> None:
+    f = FacetsFilter(facets=["make"])
+    assert f.sort is FacetSort.COUNT_DESC
+    assert f.sort.value == "-count"
+
+
+def test_facet_sort_explicit_enum_accepted() -> None:
+    f = FacetsFilter(facets=["make"], sort=FacetSort.COUNT)
+    assert f.sort is FacetSort.COUNT
+    assert f.to_params()["sort"] == "count"
+
+
+def test_facet_sort_raw_string_coerces() -> None:
+    # Pydantic coerces raw strings matching enum values in lax mode.
+    f = FacetsFilter(facets=["make"], sort="-count")  # type: ignore[arg-type]
+    assert f.sort is FacetSort.COUNT_DESC
+
+
+def test_facet_sort_all_wire_values() -> None:
+    expected = {
+        FacetSort.COUNT: "count",
+        FacetSort.COUNT_DESC: "-count",
+        FacetSort.METRIC: "metric",
+        FacetSort.METRIC_DESC: "-metric",
+    }
+    for member, wire in expected.items():
+        f = FacetsFilter(facets=["make"], sort=member)
+        assert f.to_params()["sort"] == wire
+
+
+# ---------------------------------------------------------------------------
 # DealerSummary / DealerDetail / DealersPage
 # ---------------------------------------------------------------------------
 
@@ -427,9 +550,6 @@ def test_dealer_filter_dealer_id_100_ok() -> None:
 # ---------------------------------------------------------------------------
 # FacetsFilter validators
 # ---------------------------------------------------------------------------
-
-
-from visor.models.facets import FacetsFilter  # noqa: E402
 
 
 def test_facets_filter_value_limit_max_100() -> None:

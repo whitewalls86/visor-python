@@ -45,6 +45,7 @@ EXPECTED_EXPORTS = {
     "FacetsResponse",
     "FacetsData",
     "FacetBucket",
+    "FacetSort",
     # shared models
     "Pagination",
     "DealerRef",
