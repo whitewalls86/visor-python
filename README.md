@@ -159,6 +159,38 @@ filter = ListingsFilter(
 
 All responses — `ListingsPage`, `ListingDetail`, `VinDetail`, etc. — are Pydantic v2 models. Access fields as attributes and use standard Pydantic methods (`.model_dump()`, `.model_json_schema()`, etc.) as needed.
 
+### Optional include fields
+
+Some fields are only populated when you request them via `include=`. The API uses three distinct states that the SDK preserves:
+
+| Value | Meaning |
+|---|---|
+| `None` | Section not requested — `include=` was not passed, or the API omitted the field |
+| `[]` | Section requested but no data exists |
+| `[...]` | Section requested and populated |
+
+Fields that follow this pattern:
+
+- `ListingDetail.price_history` — pass `include=["price_history"]` to `get_listing()`
+- `ListingSnapshot.price_history` — pass `include=["price_history"]` to `lookup_vin()`
+- `VehicleBuild.options` — pass `include=["options"]` to `get_listing()` or `lookup_vin()`
+
+```python
+listing = client.get_listing(listing_id, include=["price_history"])
+
+if listing.price_history is None:
+    print("price history was not requested")
+elif listing.price_history == []:
+    print("requested but no price changes recorded")
+else:
+    for entry in listing.price_history:
+        print(entry.date, entry.price)
+```
+
+`ListingSummary.price_history` and `ListingSummary.options` (returned by `filter_listings()`)
+default to `[]` and are not include-backed — the API omits them entirely when `include=` is not
+passed, so `[]` reliably means "not present in response" for summary listings.
+
 ## Error handling
 
 All methods raise typed exceptions from `visor.exceptions`. The SDK does not retry automatically — `RateLimitError.retry_after` gives you the hint to build your own retry logic.
