@@ -187,9 +187,11 @@ else:
         print(entry.date, entry.price)
 ```
 
-`ListingSummary.price_history` and `ListingSummary.options` (returned by `filter_listings()`)
-default to `[]` and are not include-backed — the API omits them entirely when `include=` is not
-passed, so `[]` reliably means "not present in response" for summary listings.
+`ListingSummary.price_history` and `ListingSummary.options` are also populated via
+`ListingsFilter(include=...)`, but they default to `[]` when the API omits the key.
+For summary listings, `[]` can mean either "not present in the response" or
+"requested and empty"; use detail/VIN lookups if you need the three-state
+`None` / `[]` / populated distinction.
 
 ## Error handling
 

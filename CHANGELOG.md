@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `FacetSort` enum (`str, Enum` with `COUNT`, `COUNT_DESC`, `METRIC`, `METRIC_DESC`) replaces
-  the previous `Literal` type alias, matching the `SortOrder` pattern used by `ListingsFilter`.
-  Raw string values (e.g. `"-count"`) continue to validate through Pydantic's lax coercion.
-  `FacetSort` is now exported from the `visor` package root.
+- `FacetSort` is now exported from the `visor` package root.
+
+### Changed
+
+- `FacetSort` converted from a `Literal` type alias to a `str, Enum`
+  (`COUNT`, `COUNT_DESC`, `METRIC`, `METRIC_DESC`), matching the `SortOrder` pattern used by
+  `ListingsFilter`. Raw string values (e.g. `"-count"`) continue to validate through Pydantic's
+  lax coercion.
 - `FacetsFilter.sort` default changed from the string literal `"-count"` to `FacetSort.COUNT_DESC`.
 
 ### Fixed
